@@ -5,29 +5,25 @@ import Loading from "../components/Loading";
 import Feed from "../components/Feed";
 import TopCreators from "../components/TopCreators";
 
-
 function Home() {
- 
-  const dispatch = useDispatch()
-  
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated)
-  console.log(isAuthenticated);
-  useEffect(() => {
-    isAuthenticated && dispatch(getUser())
-  }, []);
-  const user = useSelector((state) => state.user.user)
-  const isLoading = useSelector((state) => state.user.isLoading)
+  const dispatch = useDispatch();
 
-  console.log(user);
-  
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+  useEffect(() => {
+    isAuthenticated && dispatch(getUser());
+  }, []);
+  const isLoading = useSelector((state) => state.user.isLoading);
+
   return (
     <>
-  {isLoading ? <Loading/> :
-  <main className="flex">
-    
-    <Feed/>
-    <TopCreators/>
-  </main>}
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <main className="flex">
+          <Feed />
+          <TopCreators />
+        </main>
+      )}
     </>
   );
 }

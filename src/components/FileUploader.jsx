@@ -77,9 +77,8 @@ export default function FileUploader(props) {
       setFiles(acceptedFiles.map(file => Object.assign(file, {
         preview: URL.createObjectURL(file)
       })));
+      // eslint-disable-next-line react/prop-types
       props.fieldChange(acceptedFiles);
-      console.log(myCustomFileGetter(event));
-      console.log(acceptedFiles);
       
     },getFilesFromEvent: event => myCustomFileGetter(event)
   });
@@ -117,9 +116,9 @@ export default function FileUploader(props) {
 
   return (
     <section>
-      <div {...getRootProps({style})}>
+      <div  className='cursor-pointer' {...getRootProps({style})}>
         <input {...getInputProps()} className='postImage'/>
-        <p>Drag 'n' drop some files here, or click to select files</p>
+        <p>{`Drag 'n' drop some files here, or click to select files`}</p>
       </div>
       <aside style={thumbsContainer}>
         {thumbs}

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux"
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { sidebarLinks } from "./linksArray";
 import { getUser, loggedOutAction } from "../redux/userSlice";
 import { logOut } from "../appwrite/api";
@@ -13,7 +13,6 @@ function SideBar() {
   const { toast } = useToast();
   const { pathname } = useLocation();
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated)
-  console.log(isAuthenticated);
   useEffect(() => {
     isAuthenticated && dispatch(getUser())
   }, []);
@@ -34,11 +33,11 @@ function SideBar() {
   }
   return (
     
-    <aside className='bg-bg text-white h-screen p-6'>
-      <h2 className="text-white bg-cOne font-bold text-3xl p-3 mb-4 rounded-lg">
+    <aside className='bg-bg text-white h-screen p-6 hidden md:block'>
+      <Link to='/' className="text-white bg-cOne font-bold text-3xl p-3 mb-4 rounded-lg">
         Facebooky
-      </h2>
-      <NavLink to={`/profile/` + user.$id}>
+      </Link>
+      <Link to={`/profile/` + user.$id}>
       <div className="profile mt-8 flex justify-start items-center gap-3">
         <img src={user.imageUrl} alt="profileImage"  className="w-14 rounded-full"/>
         <div className="info">
@@ -46,11 +45,10 @@ function SideBar() {
           <div className="username text-sm text-cOne">{"@" + user.username}</div>
         </div>
       </div>
-      </NavLink>
+      </Link>
       <ul className="flex flex-col gap-6 mt-9">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.route;
-            console.log(pathname);
             return (
               <li
                 key={link.label}

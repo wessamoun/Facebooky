@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   useGetLikedPosts,
   useGetUserById,
@@ -12,22 +12,29 @@ import { useSelector } from "react-redux";
 
 function Profile() {
   const Account = useSelector((state) => state.user.user);
-  let { userId } = useParams();
-  console.log(userId);
-  const { data: user, isLoading: isUserLoading } = useGetUserById(userId);
-  const { data: userPosts, isLoading: isUserPostsLoading } = useGetUserPosts(userId);
+
+  const { userId } = useParams();
+
+  const {
+    data: user,
+    isPending: isUserLoading,
+    isRefetching: reF,
+  } = useGetUserById(userId || "");
+  const { data: userPosts, isPending: isUserPostsLoading } =
+    useGetUserPosts(userId);
   const likedPostsArray = user?.liked.map((liked) => liked.$id);
-  const { data: likedPosts, isLoading: isLikedPostsLoading } =
+  const { data: likedPosts, isPending: isLikedPostsLoading } =
     useGetLikedPosts(likedPostsArray);
-  // console.log(user?.liked);
-  console.log(isLikedPostsLoading ? "Loading..." : likedPosts);
+
   return (
     <>
-      {isUserLoading ? (
+      {reF ? (
+        <Loading />
+      ) : isUserLoading ? (
         <Loading />
       ) : (
-        <div className="p-16 w-full h-screen overflow-scroll">
-          <div className="header flex gap-6">
+        <div className="p-8 md:p-16 w-full h-screen overflow-scroll mt-12 md:mt-0 mb-20 md:mb-0">
+          <div className="header flex flex-col md:flex-row justify-center items-center text-center gap-6">
             <div className="image">
               <img
                 className="w-32 rounded-full"
@@ -36,7 +43,7 @@ function Profile() {
               />
             </div>
             <div className="info text-white flex flex-col flex-1 gap-2">
-              <div className="name text-3xl">{user.name}</div>
+              <div className="name text-4xl font-bold">{user.name}</div>
               <div className="username text-cOne text-sm">
                 {"@" + user.username}
               </div>
@@ -45,30 +52,32 @@ function Profile() {
                 <span className="text-cOne mr-3">{user.posts.length}</span>Posts
               </div>
             </div>
-            <div className="edit">
-              {Account.$id === userId && <Button>
-                <img
-                  src="../../public/assets/icons/edit.svg"
-                  alt="image"
-                  className="w-6 mr-3"
-                />
-                Edit Profile
-              </Button>}
-            </div>
+            <Link to={"/editProfile/" + userId} className="edit">
+              {Account.$id === userId && (
+                <Button>
+                  <img
+                    src="/assets/icons/edit.svg"
+                    alt="image"
+                    className="w-6 mr-3"
+                  />
+                  Edit Profile
+                </Button>
+              )}
+            </Link>
           </div>
           <Tabs defaultValue="Posts" className="w-full mt-16 text-white">
-            <TabsList className="bg-bg ">
-              <TabsTrigger value="Posts" className="text-xl w-56">
+            <TabsList className="bg-bg flex justify-center">
+              <TabsTrigger value="Posts" className="text-lg w-full md:w-56">
                 <img
-                  src="../../public/assets/icons/wallpaper.svg"
+                  src="/assets/icons/wallpaper.svg"
                   alt="image"
                   className="w-6 mr-3"
                 />
                 Posts
               </TabsTrigger>
-              <TabsTrigger value="Likes" className="text-xl w-56">
+              <TabsTrigger value="Likes" className="text-lg w-full md:w-56">
                 <img
-                  src="../../public/assets/icons/like.svg"
+                  src="/assets/icons/like.svg"
                   alt="image"
                   className="w-6 mr-3"
                 />{" "}
@@ -77,7 +86,8 @@ function Profile() {
             </TabsList>
             <TabsContent value="Posts" className="text-white">
               <div className="flex flex-col gap-5 mt-9">
-                {userPosts === undefined ? (
+                {userPosts === undefined ||
+                  userPosts.documents.length === 0 ? (
                   "No Posts Created"
                 ) : isUserPostsLoading ? (
                   <Loading />
@@ -90,10 +100,11 @@ function Profile() {
             </TabsContent>
             <TabsContent value="Likes" className="text-white">
               <div className="flex flex-col gap-5 mt-9">
-                {likedPosts === undefined ? (
-                  "No Posts Created"
-                ) : isLikedPostsLoading ? (
+                {isLikedPostsLoading ? (
                   <Loading />
+                ) : likedPosts === undefined ||
+                  likedPosts.documents.length === 0 ? (
+                  "No Posts Liked"
                 ) : (
                   likedPosts.documents.map((post) => (
                     <PostCard post={post} key={post.$id} />

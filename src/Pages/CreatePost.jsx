@@ -36,7 +36,6 @@ function CreatePost() {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     try {
-      console.log(values);
 
       const newPost = await createNewPost({
         ...values,
@@ -48,14 +47,13 @@ function CreatePost() {
       }
 
       navigate("/");
-      console.log(newPost);
     } catch (error) {
       console.log(error);
     }
   }
   return (
     <div className="flex flex-col flex-1 h-screen text-white pt-12 px-8 gap-6 overflow-scroll">
-      <div className=" text-2xl font-bold">Create Post</div>
+      <div className=" text-2xl font-bold mt-12 md:mt-0">Create Post</div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
           <FormField

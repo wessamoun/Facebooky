@@ -9,12 +9,12 @@ import { QueryProvider } from "./lib/Rquery/QueryProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <QueryProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <QueryProvider>
         <Provider store={store}>
           <App />
         </Provider>
-      </BrowserRouter>
-    </QueryProvider>
+      </QueryProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

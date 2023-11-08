@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { useCreateAccount, useSignIn } from "../lib/Rquery/RTQApi";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getUser } from "../redux/userSlice";
 
 const formSchema = z.object({
@@ -37,8 +37,6 @@ function SignUp() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-  console.log(isAuthenticated);
 
   const form = useForm({
     resolver: zodResolver(formSchema),

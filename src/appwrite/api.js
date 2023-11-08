@@ -64,7 +64,6 @@ export async function getCurrentUser() {
   try {
     const currentAccount = await getAccount();
 
-    console.log(currentAccount + "cA");
 
     if (!currentAccount) throw Error;
 
@@ -74,7 +73,6 @@ export async function getCurrentUser() {
       [Query.equal("accountId", currentAccount.$id)]
     );
 
-    console.log(currentUser + "cU");
 
     if (!currentUser) throw Error;
 
@@ -100,7 +98,6 @@ export async function logOut() {
 
 export async function uploadFile(file) {
   try {
-    console.log(file);
     if (file !== undefined) {
       const uploadedFile = await storage.createFile(
         appwriteConfig.storageId,
@@ -116,7 +113,6 @@ export async function uploadFile(file) {
 
 export async function createPost(values) {
   try {
-    console.log(values);
     const uploadedFile = await uploadFile(values.image[0]);
 
     const fileUrl = storage.getFilePreview(
@@ -148,6 +144,35 @@ export async function createPost(values) {
     console.log(error);
   }
 }
+export async function editProfile(values) {
+  try {
+    const uploadedFile = await uploadFile(values.file);
+
+    const fileUrl = storage.getFilePreview(
+      appwriteConfig.storageId,
+      uploadedFile?.$id || ""
+    );
+
+
+    const user = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      values.userId,
+      {
+        name: values.name,
+        imageUrl: fileUrl,
+        bio: values.bio
+      }
+    );
+    if (!user) {
+      await deleteFile(uploadedFile?.$id);
+      throw Error;
+    }
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export async function getPosts() {
   try {
@@ -156,7 +181,6 @@ export async function getPosts() {
       appwriteConfig.postCollectionId,
       [Query.orderDesc("$createdAt")]
     );
-
     return posts;
   } catch (error) {
     console.log(error);
@@ -197,7 +221,6 @@ export async function updatePost(values) {
       },
       [Permission.update(Role.any())]
     );
-    console.log(updatedPost);
     return updatedPost;
   } catch (error) {
     console.log(error);
@@ -216,6 +239,21 @@ export async function savePost(values) {
       }
     );
     return savedPost;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function deleteSavedPost(savedId) {
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+      savedId
+    );
+
+    if (!statusCode) throw Error;
+
+    return { status: "Ok" };
   } catch (error) {
     console.log(error);
   }
@@ -253,6 +291,7 @@ export async function getUserPosts(userId) {
       appwriteConfig.postCollectionId,
       [Query.equal("creator", [userId])]
     );
+    
     return userPosts;
   } catch (error) {
     console.log(error);
@@ -261,11 +300,10 @@ export async function getUserPosts(userId) {
 export async function getLikedPosts(userId = []) {
 
   try {
-    console.log(userId);
     const userPosts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      [Query.equal("$id", [...userId])]
+      [Query.equal("$id", [...userId,"@"])]
     );
     return userPosts;
   } catch (error) {

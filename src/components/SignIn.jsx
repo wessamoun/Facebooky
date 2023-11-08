@@ -53,7 +53,6 @@ try {
 
         return;
       } else {
-        console.log("actions");
         navigate("/")
         dispatch(getUser());
       }
@@ -65,8 +64,8 @@ try {
   return (
     <div className="flex flex-col justify-center items-center">
     <h2 className="text-white bg-cOne font-bold text-3xl p-3 mb-4 rounded-lg">Facebooky</h2>
-    <h3 className="text-white font-bold text-2xl lg:text-3xl p-3">Log in to your account</h3>
-    <p className=" text-cOne text-sm p-3 mb-2">Welcome back! Please enter your details.</p>
+    <h3 className="text-white font-bold text-2xl lg:text-3xl p-1">Log in to your account</h3>
+    <p className=" text-cOne text-sm p-1 mb-2">Welcome back! Please enter your details.</p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
           <FormField
@@ -100,7 +99,7 @@ try {
           <Button className="bg-cOne mx-auto w-full" type="submit">{isSigningIn ? "Loading..." :"Log in"}</Button>
         </form>
       </Form>
-      <p className="text-white mt-4">Don't have an account? <Link to="/signup" className="text-cOne">Sign up</Link></p>
+      <p className="text-white mt-4">{`Don't have an account?`} <Link to="/signup" className="text-cOne">Sign up</Link></p>
     </div>
   );
 }

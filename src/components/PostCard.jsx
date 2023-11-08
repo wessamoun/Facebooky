@@ -1,25 +1,34 @@
 /* eslint-disable react/prop-types */
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useDeletePost, useSavePost, useUpdatePost } from "../lib/Rquery/RTQApi";
-import likedImage from "../../public/assets/icons/liked.svg"
-import likeImage from "../../public/assets/icons/like.svg"
-import saveImage from "../../public/assets/icons/save.svg"
-import savedImage from "../../public/assets/icons/saved.svg"
-import { Link, NavLink } from "react-router-dom";
+import { useDeletePost, useDeleteSavedPost, useGetCurrentUser, useSavePost, useUpdatePost } from "../lib/Rquery/RTQApi";
+import likedImage from "/assets/icons/liked.svg"
+import likeImage from "/assets/icons/like.svg"
+import saveImage from "/assets/icons/save.svg"
+import savedImage from "/assets/icons/saved.svg"
+import { Link } from "react-router-dom";
 
 function PostCard({ post }) {
+  
   const user = useSelector((state) => state.user.user);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const likesList = post.likes.map((user) => user.$id);
   const [likes, setLikes] = useState(likesList);
+  const { data: currentUser } = useGetCurrentUser();
   const { mutateAsync: deletePost, isPending: isDeleting } = useDeletePost();
-  const { mutateAsync: savePost, isPending: isSaving } = useSavePost();
+  const { mutateAsync: savePost, isPending: isSaving} = useSavePost();
+  const { mutateAsync: deleteSavedPost, isPending: isDeletingSaving } = useDeleteSavedPost();
   const { mutateAsync: updatePost} = useUpdatePost();
+  const savedPostRecord = (currentUser) && currentUser?.save.find(
+  (record) => record.post.$id === post.$id
+  );
   useEffect(()=> {
     likes.includes(user.$id) ? setLiked(true) : setLiked(false);
   },[likes])
+  useEffect(()=> {
+    setSaved(!!savedPostRecord);
+  },[currentUser])
   const like = (e) => {
     
     e.stopPropagation();
@@ -31,14 +40,20 @@ function PostCard({ post }) {
     } else {
       likesArray.push(user.$id);
     }
-    
     setLikes(likesArray);
     updatePost({ postId: post.$id, likesArray });
   };
   const save = (e) => {
-    saved ? setSaved(false) : setSaved(true);
     e.stopPropagation();
-    savePost({userId: user.$id, postId: post.$id})
+    
+    if (savedPostRecord) {
+      setSaved(false)
+      deleteSavedPost(savedPostRecord.$id)
+    } else {
+      savePost({userId: user.$id, postId: post.$id})
+      setSaved(true);
+    }
+    
   };
 
 
@@ -130,11 +145,22 @@ function PostCard({ post }) {
           />
           <div className="likesCount">{likes.length}</div>
         </div>
-        <div className="save flex gap-3" onClick={save}>
-          <img
-            src={saved ? saveImage : saveImage}
+        <div className="save flex gap-3 cursor-pointer" onClick={save}>
+          
+          {isSaving ? (
+            <svg
+              className="animate-spin h-5 w-5 rounded-full border border-t-gray border-cOne"
+              viewBox="0 0 24 24"
+            ></svg>
+          ) : isDeletingSaving ? (
+            <svg
+              className="animate-spin h-5 w-5 rounded-full border border-t-gray border-cOne"
+              viewBox="0 0 24 24"
+            ></svg>
+          ) : <img
+            src={saved ? savedImage : saveImage}
             alt="save"
-          />
+          />}
         </div>
       </div>
     </div>

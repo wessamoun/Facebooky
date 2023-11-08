@@ -12,7 +12,7 @@ function CheckAuth() {
       cookieFallback === undefined
     ) {
       navigate("/signin");
-    } else if (pathName === "isgnin" || pathName === "signup") {
+    } else if (pathName === "sgnin" || pathName === "signup") {
       navigate("/");
     }
   }, [cookieFallback]);
